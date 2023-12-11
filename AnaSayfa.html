@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uçak Bileti Rezervasyon</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script>
+        var iller = [
+            "Adana", "Adıyaman", "Alanya", "Ağrı", "Amasya", "Ankara", "Antalya",
+            "Balıkesir", "Bingöl", "Bursa", "Çanakkale", "Denizli", "Diyarbakır", "Elazığ", "Erzincan", "Erzurum", "Eskişehir", 
+            "Gaziantep", "Hakkari", "Hatay", "Isparta", "İçel (Mersin)", "İstanbul", "İzmir", "Kars",
+            "Kastamonu", "Kayseri", "Kırklareli", "Kırşehir", "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa",
+            "Kahramanmaraş", "Mardin", "Muğla", "Muş", "Nevşehir", "Niğde", "Ordu-Giresun", "Rize", "Samsun",
+            "Siirt", "Sinop", "Sivas", "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Şanlıurfa", "Uşak", "Van",
+            "Yozgat", "Zonguldak", "Aksaray", "Bayburt", "Karaman", "Kırıkkale", "Batman", "Şırnak"
+        ];
+
+        var sabitSaatler = [
+            "09:00", "12:30", "14:45", "18:00", "23:00"
+        ];
+
+        function onNeredenChange() {
+            var neredenSelect = document.getElementById("from");
+            var nereyeSelect = document.getElementById("to");
+
+            var selectedNereden = neredenSelect.options[neredenSelect.selectedIndex].value;
+
+            nereyeSelect.innerHTML = '<option value="" selected disabled hidden>İl Seçin</option>';
+
+            for (var i = 0; i < iller.length; i++) {
+                if (iller[i] !== selectedNereden) {
+                    var option = document.createElement("option");
+                    option.text = iller[i];
+                    nereyeSelect.add(option);
+                }
+            }
+
+            nereyeSelect.disabled = (selectedNereden === "");
+            
+            // Seçilen değerleri session storage'a kaydet
+            saveToSession();
+        }
+
+        function saveToSession() {
+            var from = document.getElementById("from").value;
+            var to = document.getElementById("to").value;
+            var date = document.getElementById("date").value;
+            var flightClass = document.getElementById("class").value;
+            var airline = document.getElementById("airline").value;
+            var time = document.getElementById("time").value;
+            var passengerCount = document.getElementById("passengerCount").value;
+
+            // Bilgileri session'a kaydet
+            sessionStorage.setItem("from", from);
+            sessionStorage.setItem("to", to);
+            sessionStorage.setItem("date", date);
+            sessionStorage.setItem("class", flightClass);
+            sessionStorage.setItem("airline", airline);
+            sessionStorage.setItem("time", time);
+            sessionStorage.setItem("passengerCount", passengerCount);
+        }
+    </script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Uçak Bileti Rezervasyon</h2>
+        <form action="YolcuBilgileri.jsp" method="post">
+            <!-- Nereden Nereye  -->
+            <div class="form-group">
+                <label for="from">Nereden:</label>
+                <select class="form-control" id="from" name="from" required onchange="onNeredenChange()">
+                    <option value="" selected disabled hidden>İl Seçin</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="to">Nereye:</label>
+                <select class="form-control" id="to" name="to" required disabled>
+                    <option value="" selected disabled hidden>İl Seçin</option>
+                </select>
+            </div>
+
+            <!-- Tarih  -->
+            <div class="form-group">
+                <label for="date">Tarih:</label>
+                <input type="date" class="form-control" id="date" name="date" required>
+            </div>
+              
+            <!-- Firma/Saat Seçimi -->
+            <div class="form-group">
+                <label for="airline">Firma:</label>
+                <select class="form-control" id="airline" name="airline" required>
+                    <option value="Turkish airline">Turkish airline</option>
+                    <option value="Anadolu Jet">Anadolu Jet</option>
+                    <option value="Pegasus">Pegasus</option>
+                </select>
+            </div>
+
+            
+               <!-- Ekonomi/Business  -->
+            <div class="form-group">
+                <label for="class">Sınıf Seçimi:</label>
+                <select class="form-control" id="class" name="class" required>
+                    <option value="Ekonomi">Ekonomi</option>
+                    <option value="Business">Business</option>
+                </select>
+            </div>
+                <div class="form-group">
+                <label for="time">Uçuş Saatleri :</label>
+                <select class="form-control" id="time" name="time" required>
+                    <!-- Sadece sabit saatleri göster -->
+                    <option value="" selected disabled hidden>Saat Seçin</option>
+                    <script>
+                        var timeSelect = document.getElementById("time");
+                        for (var i = 0; i < sabitSaatler.length; i++) {
+                            var option = document.createElement("option");
+                            option.text = sabitSaatler[i];
+                            timeSelect.add(option);
+                        }
+                    </script>
+                </select>
+            </div>
+            <!-- Kişi Sayısı -->
+            <div class="form-group">
+                <label for="passengerCount">Kişi Sayısı:</label>
+                <input type="number" class="form-control" id="passengerCount" name="passengerCount" min="1" max="9" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Rezervasyon Yap</button>
+        </form>
+    </div>
+    <script>
+        // JavaScript tarafından tüm illeri ekle
+        var fromSelect = document.getElementById("from");
+        for (var i = 0; i < iller.length; i++) {
+            var option = document.createElement("option");
+            option.text = iller[i];
+            fromSelect.add(option);
+        }
+    </script>
+</body>
+</html>
