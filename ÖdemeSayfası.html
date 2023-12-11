@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ödeme Sayfası</title>
+    <style>
+        body {
+            background-image: url('https://i.pinimg.com/564x/67/de/7b/67de7b176ed51c7a4a55d5ea68fc75a9.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #rightContainer {
+            width: 400px; /* Genişliği istediğiniz değere ayarlayabilirsiniz */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #fff; /* Border rengi ve kalınlığını istediğiniz değere ayarlayabilirsiniz */
+            border-radius: 8px; /* İsteğe bağlı: Kenar yuvarlaklığını ayarlayabilirsiniz */
+            background-color: #fff; /* Formun arka plan rengini ayarlayabilirsiniz */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color:#3498db ;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color:#808080;
+        }
+
+        #selectedSeatInfo {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="rightContainer">
+        <h2>Ödeme Bilgileri</h2>
+        <form id="paymentForm">
+            <label for="fullName">Kartın Üzerindeki Ad Soyad:</label>
+            <input type="text" id="fullName" name="fullName" placeholder="Adınız Soyadınız" required minlength="6"
+                maxlength="50" oninput="updateCharLimit(this)">
+
+            <label for="cardNumber">Kart Numarası:</label>
+            <input type="text" id="cardNumber" name="cardNumber" placeholder=" 1234 5678 9101 1213" required
+                maxlength="16">
+
+            <label for="expiryDate">Son Kullanma Tarihi (MM/YY):</label>
+            <input type="text" id="expiryDate" name="expiryDate" placeholder="MM/YY" required maxlength="5"
+                oninput="autoFormatDate(this)">
+
+            <label for="cvv">CVV/CVC:</label>
+            <input type="text" id="cvv" name="cvv" placeholder="" required maxlength="3">
+
+            <button type="button" onclick="submitPayment()">Ödemeyi Bitir</button>
+        </form>
+    </div>
+
+    <script>
+      
+      
+
+        function autoFormatDate(input) {
+            var inputValue = input.value.replace(/[^\d]/g, '');
+            if (inputValue.length > 2) {
+                inputValue = inputValue.slice(0, 2) + '/' + inputValue.slice(2);
+            }
+            input.value = inputValue;
+        }
+
+        function updateCharLimit(input) {
+            var charLimitInfo = document.getElementById(input.id + 'CharLimitInfo');
+            var currentLength = input.value.length;
+            var maxLimit = input.maxLength;
+            charLimitInfo.textContent = currentLength + '/' + maxLimit;
+        }
+
+        function submitPayment() {
+            var fullName = document.getElementById('fullName').value;
+            var cardNumber = document.getElementById('cardNumber').value;
+            var expiryDate = document.getElementById('expiryDate').value;
+            var cvv = document.getElementById('cvv').value;
+
+            if (fullName.length >= 6 && fullName.length <= 50 && cardNumber.length === 16 && expiryDate.length === 5 &&
+                cvv.length === 3) {
+                alert('Sayın ' + fullName + ', ödemeniz başarıyla gerçekleştirildi.İyi yolculuklar!');
+                window.location.href = "SonSayfaBilgileri.jsp"
+            } else {
+                alert('Lütfen tüm bilgileri  eksiksiz bir şekilde doldurunuz!.');
+            }
+        }
+    </script>
+</body>
+
+</html>
