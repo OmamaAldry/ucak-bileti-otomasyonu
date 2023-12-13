@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uçak Bileti Rezervasyonu</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+       body {
+            background-image: url(https://th.bing.com/th/id/R.d524c1dcee2234655373bd5583d8f5ae?rik=KrcKjNx5rRxpJw&riu=http%3a%2f%2fi.huffpost.com%2fgen%2f2364022%2fimages%2fo-AIRPLANE-facebook.jpg&ehk=YkKINiMn%2bi3loxNJtPU0Uzcz7wnBNlrDudg5d%2bl9eOg%3d&risl=&pid=ImgRaw&r=0);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Şeffaf siyah renkli arka plan */
+            z-index: -1; /* Altta kalması için z-index ayarı */
+        }
+
+        .container {
+            padding: 10px;
+            border-radius: 10px;
+            color: #fff;
+            margin-bottom: 20px;
+            max-width: 80%;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        select,
+        input,
+        .btn {
+            margin-bottom: 10px;
+        }
+
+        #girisButonu {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 18px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            border: 2px solid #3498db;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        #girisButonu:hover {
+            background-color: #2980b9;
+        }
+    </style>
+    <script>
+        var iller = [
+            "Adana", "Adıyaman", "Alanya", "Ağrı", "Amasya", "Ankara", "Antalya",
+            "Balıkesir", "Bingöl", "Bursa", "Çanakkale", "Denizli", "Diyarbakır", "Elazığ", "Erzincan", "Erzurum", "Eskişehir", 
+            "Gaziantep", "Hakkari", "Hatay", "Isparta", "İçel (Mersin)", "İstanbul", "İzmir", "Kars",
+            "Kastamonu", "Kayseri", "Kırklareli", "Kırşehir", "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa",
+            "Kahramanmaraş", "Mardin", "Muğla", "Muş", "Nevşehir", "Niğde", "Ordu-Giresun", "Rize", "Samsun",
+            "Siirt", "Sinop", "Sivas", "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Şanlıurfa", "Uşak", "Van",
+            "Yozgat", "Zonguldak", "Aksaray", "Bayburt", "Karaman", "Kırıkkale", "Batman", "Şırnak"
+        ];
+
+        var sabitSaatler = [
+            "09:00", "12:30", "14:45", "18:00", "23:00"
+        ];
+
+        function onNeredenChange() {
+            var neredenSelect = document.getElementById("from");
+            var nereyeSelect = document.getElementById("to");
+
+            var selectedNereden = neredenSelect.options[neredenSelect.selectedIndex].value;
+
+            nereyeSelect.innerHTML = '<option value="" selected disabled hidden>İl Seçin</option>';
+
+            for (var i = 0; i < iller.length; i++) {
+                if (iller[i] !== selectedNereden) {
+                    var option = document.createElement("option");
+                    option.text = iller[i];
+                    nereyeSelect.add(option);
+                }
+            }
+
+            nereyeSelect.disabled = (selectedNereden === "");
+            
+            // Seçilen değerleri session storage'a kaydet
+            saveToSession();
+        }
+
+        function updateFlightTimes() {
+            var airlineSelect = document.getElementById("airline");
+            var timeSelect = document.getElementById("time");
+
+            var selectedAirline = airlineSelect.options[airlineSelect.selectedIndex].value;
+
+            timeSelect.innerHTML = '<option value="" selected disabled hidden>Saat Seçin</option>';
+
+            var airlineSaatler = getAirlineSaatler(selectedAirline);
+
+            for (var i = 0; airlineSaatler && i < airlineSaatler.length; i++) {
+                var option = document.createElement("option");
+                option.text = airlineSaatler[i];
+                timeSelect.add(option);
+            }
+
+            // Seçilen değerleri session storage'a kaydet
+            saveToSession();
+        }
+
+        function getAirlineSaatler(airline) {
+            switch (airline) {
+                case "Turkish airline":
+                    return ["09:00", "12:30", "14:45", "18:00", "23:00"];
+                case "Anadolu Jet":
+                    return ["10:00", "13:30", "15:45", "19:00", "00:00"];
+                case "Pegasus":
+                    return ["11:00", "14:30", "16:45", "20:00", "01:00"];
+                default:
+                    return [];
+            }
+        }
+
+        function saveToSession() {
+            var from = document.getElementById("from").value;
+            var to = document.getElementById("to").value;
+            var date = document.getElementById("date").value;
+            var flightClass = document.getElementById("class").value;
+            var airline = document.getElementById("airline").value;
+            var time = document.getElementById("time").value;
+            var passengerCount = document.getElementById("passengerCount").value;
+
+            // Bilgileri session'a kaydet
+            sessionStorage.setItem("from", from);
+            sessionStorage.setItem("to", to);
+            sessionStorage.setItem("date", date);
+            sessionStorage.setItem("class", flightClass);
+            sessionStorage.setItem("airline", airline);
+            sessionStorage.setItem("time", time);
+            sessionStorage.setItem("passengerCount", passengerCount);
+        }
+    </script>
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="container">
+        <h2 class="text-center">Uçak Bileti Formunu Doldurunuz </h2>
+        <form action="YolcuBilgileri.jsp" method="post">
+            <!-- Nereden Nereye  -->
+            <div class="form-group">
+                <label for="from">Nereden:</label>
+                <select class="form-control" id="from" name="from" required onchange="onNeredenChange()">
+                    <option value="" selected disabled hidden>İl Seçin</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="to">Nereye:</label>
+                <select class="form-control" id="to" name="to" required disabled>
+                    <option value="" selected disabled hidden>İl Seçin</option>
+                </select>
+            </div>
+
+            <!-- Tarih  -->
+            <div class="form-group">
+                <label for="date">Tarih:</label>
+                <input type="date" class="form-control" id="date" name="date" required>
+            </div>
+              
+            <!-- Firma/Saat Seçimi -->
+            <div class="form-group">
+                <label for="airline">Firma:</label>
+                <select class="form-control" id="airline" name="airline" required onchange="updateFlightTimes()">
+                    <option value="Turkish airline">Turkish airline</option>
+                    <option value="Anadolu Jet">Anadolu Jet</option>
+                    <option value="Pegasus">Pegasus</option>
+                </select>
+            </div>
+
+            <!-- Ekonomi/Business  -->
+            <div class="form-group">
+                <label for="class">Sınıf Seçimi:</label>
+                <select class="form-control" id="class" name="class" required>
+                    <option value="Ekonomi">Ekonomi</option>
+                    <option value="Business">Business</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="time">Uçuş Saatleri :</label>
+                <select class="form-control" id="time" name="time" required>
+                    <!-- Sadece sabit saatleri göster -->
+                    <option value="" selected disabled hidden>Saat Seçin</option>
+                </select>
+            </div>
+            
+            <!-- Kişi Sayısı -->
+            <div class="form-group">
+                <label for="passengerCount">Kişi Sayısı:</label>
+                <input type="number" class="form-control" id="passengerCount" name="passengerCount" min="1" max="9" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Rezervasyon Yap</button>
+        </form>
+    </div>
+    <script>
+        // JavaScript tarafından tüm illeri ekle
+        var fromSelect = document.getElementById("from");
+        for (var i = 0; i < iller.length; i++) {
+            var option = document.createElement("option");
+            option.text = iller[i];
+            fromSelect.add(option);
+        }
+    </script>
+         <a href="giris.jsp" id="girisButonu">Giris Yap</a>
+
+</body>
+</html>
